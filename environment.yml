@@ -1,6 +1,6 @@
 ---
-name: template_project
-channels: [conda-forge, r, nodefaults]
+name: mtl
+channels: [conda-forge, nodefaults]
 dependencies:
   - python ==3.12
   - pip >=21.1
