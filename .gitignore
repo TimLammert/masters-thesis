@@ -1,0 +1,41 @@
+# python
+*.egg-info
+*_version.py
+*.pyc
+*__pycache__
+
+# python tools
+.pytest_cache
+.ruff_cache
+.pytask.sqlite3
+.pytask
+
+# R
+.RData
+.Rhistory
+
+# bld
+bld/
+
+# latex
+*.aux
+*.bbl
+*.bcf*
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.pdf
+*.run.xml
+*.synctex.gz
+*.nav
+*.snm
+*.toc
+
+# documentation
+docs_template/build/
+docs_template/scripts/latex/*.png
+
+# local
+.vscode

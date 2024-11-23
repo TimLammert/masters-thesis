@@ -1,0 +1,128 @@
+# ======================================================================================
+# Project metadata
+# ======================================================================================
+
+[project]
+name = "template_project"
+description = "Template for reproducible research projects in economics"
+requires-python = ">=3.11"
+dynamic = ["version"]
+keywords = [
+    "Reproducible Research",
+    "Economics",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+]
+authors = [
+    { name = "JANE DOE", email = "janedoe@example-university.com" },
+]
+maintainers = [
+    { name = "JANE DOE", email = "janedoe@example-university.com" },
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+Changelog = "https://github.com/OpenSourceEconomics/econ-project-templates"
+Documentation = "https://github.com/OpenSourceEconomics/econ-project-templates"
+Github = "https://github.com/OpenSourceEconomics/econ-project-templates"
+Tracker = "https://github.com/OpenSourceEconomics/econ-project-templates/issues"
+
+# ======================================================================================
+# Build system configuration
+# ======================================================================================
+
+[build-system]
+requires = ["hatchling", "hatch_vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/template_project/_version.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = ["tests"]
+only-packages = true
+
+[tool.hatch.build.targets.wheel]
+only-include = ["src"]
+sources = ["src"]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+# ======================================================================================
+# Pytask configuration
+# ======================================================================================
+
+[tool.pytask.ini_options]
+paths = ["./src/template_project", "./documents"]
+pdbcls = "pdbp:Pdb"
+
+# ======================================================================================
+# Ruff configuration
+# ======================================================================================
+
+[tool.ruff]
+target-version = "py312"
+fix = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+extend-ignore = [
+    "ANN",  # Missing type annotations
+    "COM812", # Conflict with ruff-format
+    "D10",  # Missing docstrings
+    "ISC001", # Conflict with ruff-format
+    "PD901", # df is a great name with functional data management
+    "PLR0913",  # Too many arguments in function definition
+    "RET504", # Don't force to calculate upon return
+    "S101",  # Use of `assert` detected.
+    "S301",  # pickle module is unsafe
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D", "PD011"]
+"task_*.py" = ["ANN", "ARG001"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# ======================================================================================
+# Miscellaneous tools configuration
+# ======================================================================================
+
+
+[tool.pytest.ini_options]
+addopts = "--pdbcls=pdbp:Pdb"
+filterwarnings = []
+markers = [
+    "wip: Tests that are work-in-progress.",
+    "unit: Flag for unit tests which target mainly a single function.",
+    "integration: Flag for integration tests which may comprise of multiple unit tests.",
+    "end_to_end: Flag for tests that cover the whole program.",
+]
+norecursedirs = ["docs"]
+
+
+[tool.yamlfix]
+line_length = 88
+none_representation = "null"
+
+
+[tool.codespell]
+skip = "*.ipynb,inst/WORDLIST"
