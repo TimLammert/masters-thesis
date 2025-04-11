@@ -8,7 +8,7 @@
 .pytest_cache
 .ruff_cache
 .pytask.sqlite3
-.pytask
+trashcan/.pytask
 
 # R
 .RData
@@ -32,10 +32,6 @@ bld/
 *.nav
 *.snm
 *.toc
-
-# documentation
-docs_template/build/
-docs_template/scripts/latex/*.png
 
 # local
 .vscode
