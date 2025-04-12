@@ -48,14 +48,12 @@ def create_rectangular_partition_and_tree_plots(folder_path):
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
 
     xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
-    grid = np.c_[xx.ravel(), yy.ravel()]
 
     feature_range = (x_min, x_max, y_min, y_max)
     boxes = get_boxes(reg_tree.tree_, feature_range)
 
     fig, ax = plt.subplots(figsize=(12, 9))
 
-    # Add rectangles with predicted values
     for (x0, x1, y0, y1, pred) in boxes:
         rect = patches.Rectangle((x0, y0), x1 - x0, y1 - y0, edgecolor='black', facecolor="white", alpha=0.5)
         ax.add_patch(rect)
@@ -70,7 +68,7 @@ def create_rectangular_partition_and_tree_plots(folder_path):
 
 def get_boxes(tree, feature_range):
     """
-
+    Creates boxes for rectangular partition plot.
     """
     left = tree.children_left
     right = tree.children_right
@@ -86,10 +84,10 @@ def get_boxes(tree, feature_range):
             feat = tree.feature[node]
             thresh = threshold[node]
 
-            if feat == 0:  # Split on X1
+            if feat == 0:
                 recurse(left[node], x0, thresh, y0, y1)
                 recurse(right[node], thresh, x1, y0, y1)
-            elif feat == 1:  # Split on X2
+            elif feat == 1:
                 recurse(left[node], x0, x1, y0, thresh)
                 recurse(right[node], x0, x1, thresh, y1)
 
@@ -300,7 +298,6 @@ def create_combined_plot(folder_path):
         col=2
     )
 
-    # Update layout
     fig.update_layout(
         template="plotly_white",
         height=500,
@@ -308,9 +305,7 @@ def create_combined_plot(folder_path):
         legend=dict(orientation="h", y=-0.2, x=0.5, xanchor="center", yanchor="top"),
     )
     fig.update_xaxes(title_text="Z", row=1, col=1)
-    # fig.update_yaxes(title_text="Y", row=1, col=1)
     fig.update_xaxes(title_text="X", row=1, col=2)
-    # fig.update_yaxes(title_text="Y-axis Title 2", row=1, col=2)
     fig = update_plot_layout(fig)
     fig.write_image(folder_path / 'combined_bagged_unbagged_plot.png', scale=3)
 
@@ -324,7 +319,6 @@ def create_random_walk_failure_plot(folder_path):
         set_sizes= {'training': 500, 'testing': 500},
         parameters=[1],
         steps_ahead=1,
-        garch_resid_only=False,
         garch_variance_noise=0,
         ar_sigma=1
     )
@@ -371,11 +365,10 @@ def create_all_theory_plots():
     if not folder_path.is_dir():
         folder_path.mkdir(exist_ok=True, parents=True)
 
-
+    create_rectangular_partition_and_tree_plots(folder_path)
     create_overfitting_depth_plot(folder_path)
     create_instability_plot(folder_path)
     create_random_walk_failure_plot(folder_path)
-    create_rectangular_partition_and_tree_plots(folder_path)
     create_combined_plot(folder_path)
 
 

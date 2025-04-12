@@ -6,18 +6,14 @@ def df_to_latex(df, table_name:str, table_label:str='my_table', round=4):
     """
     df = df.round(round)
     df = df.apply(lambda col: col.map(lambda x: f"{x:.{round}f}" if isinstance(x, (int, float)) else x))
-    # Start the LaTeX table
     latex_str = "\\begin{table}[h]\n\\centering\n\\begin{tabular}{" + " ".join(
         ["c"] * (df.shape[1] + 1)) + " }\n\\hline\n"
 
-    # Add column headers
     latex_str += " & " + " & ".join(df.columns.astype(str)) + " \\\\\n\\hline\n"
 
-    # Add rows dynamically
     for index, row in df.iterrows():
         latex_str += str(index) + " & " + " & ".join(row.astype(str)) + " \\\\\n"
 
-    # Close the LaTeX table
     latex_str += f"\\hline\n\\end{{tabular}}\n\\caption{'{'}{table_name}{'}'}\n\\label{'{tab:'}{table_label}{'}'}\n\\end{'{table}'}"
 
     return latex_str.replace('_', ' ')
@@ -25,7 +21,7 @@ def df_to_latex(df, table_name:str, table_label:str='my_table', round=4):
 
 def df_to_latex_regression_table(ols_df):
     """
-    Converts an OLS DataFrame to a LaTeX regression table.
+    Converts a DataFrame to a table displaying regression coefficients and standard errors.
     """
     latex_table = """
         \\begin{table}[ht]
@@ -41,7 +37,6 @@ def df_to_latex_regression_table(ols_df):
         variable = index
         coefficient = row['Coefficient']
         std_error = row['Std Error']
-        # Making the standard error smaller using \scriptsize
         latex_table += f"{variable} & {coefficient:.4f} \\\\ \n"
         latex_table += f"      & \\scriptsize({std_error:.4f}) \\\\ \n"  # std_error is now smaller
 
@@ -57,7 +52,7 @@ def df_to_latex_regression_table(ols_df):
 
 def df_to_latex_regression_table_with_two_columns(ols_df, table_name, macro, no_macro):
     """
-    Converts an OLS DataFrame to a LaTeX regression table with two columns.
+    Converts a DataFrame to a table with two columns displaying regression coefficients and standard errors.
     """
     latex_table = """
         \\begin{table}[ht]
@@ -75,7 +70,6 @@ def df_to_latex_regression_table_with_two_columns(ols_df, table_name, macro, no_
         coef_ols2 = row[f'{macro} Coefficient']
         std_error_ols2 = row[f'{macro} Std Error']
 
-        # Write coefficient values and their standard errors in the correct format
         latex_table += f"{variable} & {coef_ols1:.4f} & {coef_ols2:.4f} \\\\ \n"
         latex_table += f"         & \\scriptsize({std_error_ols1:.4f}) & \\scriptsize({std_error_ols2:.4f}) \\\\ \n"
 
@@ -87,5 +81,3 @@ def df_to_latex_regression_table_with_two_columns(ols_df, table_name, macro, no_
         """
 
     return latex_table
-
-
