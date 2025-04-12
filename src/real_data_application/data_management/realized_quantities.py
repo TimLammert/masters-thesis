@@ -1,17 +1,18 @@
 """
 Computes realized variance, and its decomposition into a continuous and a jump part, from intraday stock price data.
-Code is based on the RealizedQuantites repo by Sebastian Bayer, https://github.com/BayerSe/RealizedQuantities/
+Code is based on the RealizedQuantities repo by Sebastian Bayer, https://github.com/BayerSe/RealizedQuantities/.
 FirstRate Data does not permit the distribution of its intraday stock data sets.
 Hence, data includes a sample to run this function and the output of this function for the entire dataset.
 """
 
 
+import pickle
 import numpy as np
 import pandas as pd
 from scipy import stats
 from scipy.special import gamma
 from config import DATA_DIR, BLD_data
-import pickle
+
 
 def collect_realized_quantity_data():
     """
@@ -32,7 +33,9 @@ def collect_realized_quantity_data():
 
 
 def clean_intraday_data(data):
-    """Sets index of the stock price DataFrame and sets the last closing price as the final opening price. """
+    """
+    Sets index of the stock price DataFrame and sets the last closing price as the final opening price.
+    """
     df = data.copy()
     df['DateTime'] = pd.to_datetime(df['DateTime'])
     df = df.set_index('DateTime')

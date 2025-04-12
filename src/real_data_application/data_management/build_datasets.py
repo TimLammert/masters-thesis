@@ -1,6 +1,6 @@
 """
 Creates datasets for forecasts of S&P500 realized variance from the previously generated realized quantities
-and the collected macroeconomic data.
+and the collected macroeconomic variables.
 
 """
 import pandas as pd
@@ -166,7 +166,8 @@ def create_datasets(steps_ahead=1, start_date='2008-02-04', end_date='2024-12-31
         datasets[name] = df.loc[start_date:end_date]
 
     folder_path = BLD_data / 'application'
-    file_name  = f'datasets_{steps_ahead}_step_ahead_square_root.pkl' if square_root else f'datasets_{steps_ahead}_step_ahead.pkl'
+    file_name  = (f'datasets_{steps_ahead}_step_ahead_square_root.pkl'
+                  if square_root else f'datasets_{steps_ahead}_step_ahead.pkl')
     file_path = folder_path / file_name
     with open(file_path, "wb") as f:
         pickle.dump(datasets, f)

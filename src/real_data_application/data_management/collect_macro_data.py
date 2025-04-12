@@ -1,5 +1,6 @@
 """
-Gathers macroeconomic data and release dates and stores them in a dict to be
+Gathers macroeconomic data and release dates from the data files
+and stores them in a dict that is stored in a pickle file.
 """
 
 import pandas as pd

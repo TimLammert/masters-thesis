@@ -21,6 +21,7 @@ def create_all_tables():
         for step in [1] if sqrt else [1, 5, 22]:
             create_tables_for_one_setup(steps_ahead=step, square_root=sqrt)
 
+
 def create_tables_for_one_setup(steps_ahead:int, square_root:bool):
     """
     Creates tables for one setup, that is one forecqst horizon and one value for square_root, but for both fixed
@@ -105,8 +106,6 @@ def create_tables_for_one_setup(steps_ahead:int, square_root:bool):
             variable_rename_dict=variable_rename_dict,
             round=4
         )
-    #create_forecast_plots(data=data, results=results, setups=setups, square_root=square_root, steps_ahead=steps_ahead)
-
 
 
 def create_evaluation_dfs(data, results, setup_model_strings, significance_levels=None, forecast_types=None):
@@ -166,8 +165,6 @@ def create_evaluation_dfs(data, results, setup_model_strings, significance_level
     return out
 
 
-
-
 def create_forecast_comparison_table(tables, steps_ahead, square_root, forecast_types=None):
     """
     Combines DataFrames containing relative MSE, R-squared and Diebold-Mariano test results for different significance
@@ -179,7 +176,7 @@ def create_forecast_comparison_table(tables, steps_ahead, square_root, forecast_
         folder_path.mkdir(parents=True, exist_ok=True)
 
     if forecast_types is None:
-        forecast_types = ['fixed', 'rolling'] ###### ADD ROLLING!!!! ##########################################################################################
+        forecast_types = ['fixed', 'rolling'] 
     for fc_type in forecast_types:
         df = tables[fc_type]
         table_str = df_to_latex(df, f'{fc_type} forecast comparison', f'{fc_type}-comparison')
@@ -192,97 +189,6 @@ def create_forecast_comparison_table(tables, steps_ahead, square_root, forecast_
         file_path = folder_path / table_file_name
         with open(file_path, "w") as f:
             f.write(table_str)
-
-
-# def create_forecast_plots(data, results, setups:list[str], steps_ahead:int, square_root, forecast_types=None):
-#
-#     if forecast_types is None:
-#         forecast_types = ['fixed', 'rolling']
-#
-#     folder_path = BLD_figures / 'application' / f'{steps_ahead}_step_ahead'
-#     if not folder_path.is_dir():
-#         folder_path.mkdir(parents=True, exist_ok=True)
-#
-#     plot_rows = 2
-#     plot_cols = 2
-#
-#     colour_dict = {
-#         'True Series': 'gray',
-#         'Mean': 'red',
-#         'HAR': 'orange',
-#         'BT': 'navy'
-#     }
-#
-#     for fc_type in forecast_types:
-#         fig = make_subplots(
-#             subplot_titles=setups,
-#             rows=plot_rows,
-#             cols=plot_cols,
-#             vertical_spacing=0.1,
-#             horizontal_spacing=0.05
-#         )
-#         count = 0
-#         for i in range(plot_rows):
-#             for j in range(plot_cols):
-#                 plot_df = pd.DataFrame()
-#                 plot_df['True Series'] = data['RV']['testing']['y']
-#                 plot_df['Mean'] = plot_df['True Series'].rolling(window=252, min_periods=1).mean()
-#                 plot_df['HAR'] = results[f'HAR-{setups[count]}'][fc_type]
-#                 plot_df['BT'] = results[f'BT-{setups[count]}'][fc_type]
-#                 plot_df.index = results[f'{setups[count]} additional_info']['test_index']
-#                 plot_df = plot_df * np.sqrt(252) if square_root else plot_df * 252
-#
-#                 for col in plot_df.columns:
-#                     fig.add_trace(
-#                         go.Scatter(
-#                             x=plot_df.index,
-#                             y=plot_df[col],
-#                             mode='lines',
-#                             line=dict(
-#                                 width= 0.8 if col == 'Mean' or col == 'True Series' else 0.5,
-#                                 color=colour_dict[col]
-#                             ),
-#                             name=f'{col}',
-#                             showlegend=False,
-#                             opacity=0.5 if col == 'True Series' else 1
-#                         ),
-#                         row=i+1,
-#                         col=j+1
-#                     )
-#                 count += 1
-#                 #fig.update_xaxes(title_text='t', row=i+1, col=j+1)
-#                 #fig.update_yaxes(title_text='Forecast', row=i+1, col=j+1)
-#
-#         for name, color in colour_dict.items():
-#             fig.add_trace(
-#                 go.Scatter(
-#                     x=[None], y=[None],  # Invisible points
-#                     mode='lines',
-#                     line=dict(width=2, color=color),
-#                     name=name,
-#                     showlegend=True
-#                 )
-#             )
-#
-#         fig = update_plot_layout(fig)
-#
-#         plot_image_file_name = (
-#             f'square_root_{fc_type}_{steps_ahead}_step_ahead_forecast.png'
-#             if square_root else
-#             f'{fc_type}_{steps_ahead}_step_ahead_forecast.png'
-#         )
-#
-#         plot_pkl_file_name = (
-#             f'square_root_{fc_type}_{steps_ahead}_step_ahead_forecast.pkl'
-#             if square_root else
-#             f'{fc_type}_{steps_ahead}_step_ahead_forecast.pkl'
-#         )
-#
-#         plot_image_path = folder_path / plot_image_file_name
-#         plot_pkl_path = folder_path / plot_pkl_file_name
-#         fig.write_image(plot_image_path, scale=3)
-#         with open(plot_pkl_path, "wb") as f:
-#             pickle.dump(fig, f)
 
 
 def create_importance_and_hyperparameter_tables(results, setups, square_root, steps_ahead, variable_rename_dict):
@@ -429,6 +335,6 @@ def ols_summary_to_df(ols_summary):
 
     return ols_df
 
+
 if __name__ == '__main__':
     create_all_tables()
-
