@@ -1,7 +1,6 @@
 # Bagged Trees: Theoretical Foundations and Applications in Volatility Forecasting
-# Master's Thesis - M.Sc. Economics - University of Bonn
-
-# Tim Lammert
+## Master's Thesis - M.Sc. Economics - University of Bonn
+### Tim Lammert
 
 To get started, create and activate the environment with
 
@@ -13,7 +12,7 @@ $ conda activate fpl
 This project was created with the
 [econ-project-templates](https://github.com/OpenSourceEconomics/econ-project-templates).
 
-# Description
+## Description
 
 This repo contains all codes used throughout my master's thesis on bagged regression trees.
 Thse codes build plots for the theory section, perform Monte Carlo simulations, and 

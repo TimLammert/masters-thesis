@@ -1,5 +1,5 @@
 ---
-name: mtl_test
+name: mtl
 channels: [conda-forge, nodefaults]
 dependencies:
   - python ==3.12
