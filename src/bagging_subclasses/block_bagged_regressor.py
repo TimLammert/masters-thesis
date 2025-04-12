@@ -1,7 +1,7 @@
 """
 Copy/Subclass of scikit-learns BaggingRegressor and custom helper functions applying
 the moving block bootstrap to create training set bootstrap samples.
-A simple subclass was not possible, because the resampling is performed by helper functions outside of the class.
+A simple subclass was not possible, because the resampling is performed by helper functions outside the class.
 """
 
 
@@ -125,7 +125,6 @@ def _parallel_build_estimators(
     estimators = []
     estimators_features = []
 
-    # TODO: (slep6) remove if condition for unrouted sample_weight when metadata
     # routing can't be disabled.
     support_sample_weight = has_fit_parameter(ensemble.estimator_, "sample_weight")
     if not _routing_enabled() and (
@@ -164,7 +163,6 @@ def _parallel_build_estimators(
 
         fit_params_ = fit_params.copy()
 
-        # TODO(SLEP6): remove if condition for unrouted sample_weight when metadata
         # routing can't be disabled.
         # 1. If routing is enabled, we will check if the routing supports sample
         # weight and use it if it does.

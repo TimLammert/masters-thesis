@@ -17,6 +17,52 @@ import time
 
 
 class BaggedTree:
+    """
+        Bagged tree model comprised of a regression tree and a bagging component, both based on classes from
+        scikit-learn. The class is able to tune hyperparameters, perform fixed and rolling window predictions
+        and compute variable importance measures. It can be used with features adapted to time series data,
+        such as moving block and circular block bootstrap and time-series cross-validation.
+
+        Parameters
+        -----------
+        n_estimators : int
+            number of trees in the bagged tree
+        time_series : bool
+            apply time series cross validation if true
+        block_bootstrap : bool
+            apply moving block bootstrap if true
+        max_depth : int|None
+            maximum tree depth for the individual trees
+        min_samples_split : int|None
+            minimum number of samples in a node to perform a split on it
+        min_samples_leaf : int|None
+            minimum number of samples in a leaf
+        max_features: int|str|None
+            maximum number of features considered for a split (set to value smaller than one to obtain a random forest)
+        random_state: int|None
+            controls the randomness in bootstrapping the samples
+        block_size: int
+            length of blocks for moving block and circular block bootstrap
+        circular: bool
+            activate circular block bootstrap
+
+
+        Attributes
+        ----------
+        time_series : bool
+            boolean for time series cross-validation
+        block_bootstrap : bool
+            boolean for moving block bootstrap
+        circular : bool
+            circular block bootstrap
+        base_tree : DecisionTreeRegressor
+            underlying regression tree
+        model : BaggingRegressor | BlockBaggingRegressor | CircularBlockBaggingRegressor
+            bagged tree model based on the base_model
+        best_parameters : dict
+            parameters determined by cross-validation
+
+        """
 
     def __init__(
             self,
@@ -31,53 +77,7 @@ class BaggedTree:
             block_size:int=10,
             circular:bool=False,
     ):
-        """
-            Bagged tree model comprised of a regression tree and a bagging component, both based on classes from scikit-learn.
-            The class is able to tune hyperparameters, perform fixed and rolling window predictions and compute variable
-            importance measures. It can be used with features adapted to time series data, such as moving block and circular
-            block bootstrap and time-series cross-validation.
 
-            Parameters
-            -----------
-            n_estimators : int
-                number of trees in the bagged tree
-            time_series : bool
-                apply time series cross validation if true
-            block_bootstrap : bool
-                apply moving block bootstrap if true
-            max_depth : int|None
-                maximum tree depth for the individual trees
-            min_samples_split : int|None
-                minimum number of samples in a node to perform a split on it
-            min_samples_leaf : int|None
-                minimum number of samples in a leaf
-            max_features: int|str|None
-                maximum number of features considered for a split (set to value smaller than one to obtain a random forest)
-            random_state: int|None
-                controls the randomness in bootstrapping the samples
-            block_size: int
-                length of blocks for moving block and circular block bootstrap
-            circular: bool
-                activate circular block bootstrap
-
-
-            Attributes
-            ----------
-            time_series : bool
-                boolean for time series cross-validation
-            block_bootstrap : bool
-                boolean for moving block bootstrap
-            circular : bool
-                circular block bootstrap
-            base_tree : DecisionTreeRegressor
-                underlying regression tree model
-            model : BaggingRegressor | BlockBaggingRegressor | CircularBlockBaggingRegressor
-                bagged tree model based on the base_model
-            best_parameters : dict
-                parameters determined by cross-validation
-
-
-            """
         if circular and not block_bootstrap:
             msg = 'circular is enabled, set block_bootstrap=True to enable circular block bootstrap sampling.'
             raise ValueError(msg)
@@ -123,7 +123,7 @@ class BaggedTree:
     def fit(self, X, y, param_grid=None, cv_splits=5, n_jobs=1):
         """
         Fit the model with optional hyperparameter tuning via cross-validation based on a dict determining the grids
-        to search over for each hyperparameter.
+        to search over for each hyperparameter. If no dict for parameters is passed, the model is fitted as is.
 
         """
 
@@ -169,7 +169,8 @@ class BaggedTree:
 
     def feature_importance(self, X):
         """
-        Compute feature importance based on a fitted model by averaging over the importances of the individual trees.
+        Compute feature importance based on a fitted model by averaging over the importance measures
+        of the individual trees.
         """
 
         if hasattr(self.model, "estimators_"):
@@ -243,11 +244,3 @@ class BaggedTree:
                     )
 
         return np.array(rolling_predictions), feature_importances if feature_importance else None
-
-
-
-
-
-
-
-
