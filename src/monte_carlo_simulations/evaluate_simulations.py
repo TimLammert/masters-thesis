@@ -20,7 +20,6 @@ def unpack_evaluation(evaluation, base_models=None, fc_types=None):
     """
     Unpacks the results stored in the MC simulations.
     """
-
     if fc_types is None:
         fc_types = ['rolling', 'fixed']
     if base_models is None:
@@ -40,7 +39,6 @@ def unpack_evaluation(evaluation, base_models=None, fc_types=None):
             if base in base_models and 'rolling' in fc_types:
                 dfs[base]['rolling_fixed_comparison_test'] = evaluation['rolling_fixed_dm'][base]['test']
                 dfs[base]['rolling_fixed_comparison_p_value'] = evaluation['rolling_fixed_dm'][base]['p_value']
-    # dfs['mse']['true_model'] = evaluation['true_model_mse']
 
     return dfs
 
@@ -125,7 +123,7 @@ def process_fixed_simulations(processes:list|None = None):
 
     for p_type in processes:
 
-        file_path = BLD_data / 'fixed_simulation' /f'fixed_estimation_simulation_results_{p_type}_1_step.pkl'
+        file_path = BLD_data / 'fixed_simulation' / f'fixed_estimation_simulation_results_{p_type}_1_step.pkl'
         with open(file_path, 'rb') as f:
             loaded_file = pickle.load(f)
 
@@ -146,6 +144,7 @@ def process_fixed_simulations(processes:list|None = None):
             latex_str = df_to_latex(location, table_name, table_label)
             with open(table_file_path, "w") as f:
                 f.write(latex_str)
+
 
 def process_fixed_and_rolling_simulations(processes:list|None = None):
     """
@@ -277,7 +276,6 @@ def create_number_of_trees_subplots(process_results):
             row=1, col=col_index
         )
 
-    # Adjust subplot title font size
     fig.update_layout(
         annotations=[dict(font=dict(size=10)) for a in fig['layout']['annotations']]  # Smaller subplot titles
     )
@@ -460,13 +458,15 @@ def process_one_versus_one_hundred_trees_simulation(processes:list|None = None):
 
     all_process_results = {}
     for p_type in processes:
-        path = BLD_data / 'one_versus_hundred_trees' / f'one_and_hundred_{p_type}.pkl' ############################## REMOVE FINISHED!!!!!!!!!!!!!!! ###################################
+        path = BLD_data / 'one_versus_hundred_trees' / f'one_and_hundred_{p_type}.pkl'
         with open(path, 'rb') as f:
             loaded_file = pickle.load(f)
 
         all_process_results[p_type] = pd.DataFrame()
         for model in ['no_block', 'block', 'circular_block']:
-            all_process_results[p_type][model] = (loaded_file['one_tree'][model] - loaded_file['hundred_trees'][model]).iloc[2:]
+            all_process_results[p_type][model] = (
+                                         loaded_file['one_tree'][model] - loaded_file['hundred_trees'][model]
+                                                 ).iloc[2:]
 
         df = all_process_results[p_type]
         table_file_path = folder_path / f'one_versus_hundred_{p_type}.txt'
@@ -524,10 +524,9 @@ def create_one_versus_hundred_subplots(process_results):
         )
 
         fig.update_yaxes(
-            title_text="MSE Difference Regression Tree - Bagged Tree" if col_index == 1 else None,
+            title_text="Regression Tree MSE - Bagged Tree MSE" if col_index == 1 else None,
             row=1, col=col_index
         )
-
 
     for model, color in colour_dict.items():
         fig.add_trace(go.Scatter(

@@ -1,5 +1,5 @@
 """
-Script that build different Monte Carlo Simulations on the number of trees, training set size, regression tree versus
+Functions build different Monte Carlo Simulations on the number of trees, training set size, regression tree versus
 bagged tree, fixed window forecasts, and fixed & rolling forecast. For some simulations, datasets are generated in
 advance, to ensure comparability across different settings. Results are stored in pickle files.
 
@@ -66,7 +66,7 @@ def do_rolling_fixed_simulation(settings:dict|None = None, set_sizes:dict|None=N
         print(f'Type {p_type} took {type_end} seconds.')
 
 
-def do_number_of_trees_simulation(settings: dict | None = None, set_sizes: dict | None=None, mc_iterations:int=1000):
+def do_number_of_trees_simulation(settings:dict|None = None, set_sizes:dict|None = None, mc_iterations:int = 1000):
     """
     Performs simulation on the number of trees that make up the bagged tree, going from one tree up to 500 trees.
     """
@@ -186,7 +186,12 @@ def do_number_of_trees_simulation(settings: dict | None = None, set_sizes: dict 
         print(f'Type {p_type} took {type_end} seconds.', flush=True)
 
 
-def do_fixed_window_simulation(settings: dict | None = None, set_sizes: dict | None=None, mc_iterations:int=1000, steps_ahead=1):
+def do_fixed_window_simulation(
+        settings: dict | None = None,
+        set_sizes: dict | None = None,
+        mc_iterations:int=1000,
+        steps_ahead=1
+):
     """
     Performs simulation comparing forecast accuracy of the different bagged tree models over a fixed window forecast
     of three different processes.
@@ -273,7 +278,7 @@ def do_training_set_size_simulation(
         'circular_block': {
             "estimator__max_depth": [6, 8, 10, None],
             "estimator__min_samples_split": [2, 5, 10, 20],
-            'n_estimators': [50, 100, 150, 200],  # , 400],
+            'n_estimators': [50, 100, 150, 200],
             'max_samples': [3]  # block length
         }
     }
@@ -385,8 +390,8 @@ def do_one_versus_hundred_trees_simulation(settings:dict|None = None, test_set_s
 
     hyperparameter_grids = {
         'one_tree': {
-            "max_depth": [6, 8, 10, None],# 10],
-            "min_samples_split": [2, 5, 10, 20] # GARCH 8, 20?
+            "max_depth": [6, 8, 10, None],
+            "min_samples_split": [2, 5, 10, 20]
         },
         'hundred_trees': {
             'block': {
@@ -501,7 +506,9 @@ def do_one_versus_hundred_trees_simulation(settings:dict|None = None, test_set_s
                         size_simulation_full_training_length=fixed_set_sizes['training']
                     )
                     for model in models:
-                        mse_dict[p_type][tree_number][model].append(np.mean(results['evaluation']['fixed'][model]['mse']))
+                        mse_dict[p_type][tree_number][model].append(
+                            np.mean(results['evaluation']['fixed'][model]['mse'])
+                        )
 
                 elif tree_number == 'one_tree':
                     one_tree_mse = do_single_regression_tree_forecast(
@@ -514,7 +521,10 @@ def do_one_versus_hundred_trees_simulation(settings:dict|None = None, test_set_s
                         mse_dict[p_type][tree_number][model].append(np.mean(one_tree_mse))
 
 
-                print(f'Model {p_type}, {tree_number}, sample_size {i} finished, took {time.time() - rep_start} seconds.', flush=True)
+                print(
+                    f'Model {p_type}, {tree_number}, sample_size {i} finished, took {time.time() - rep_start} seconds.',
+                    flush=True
+                )
 
             dfs[p_type][tree_number] = pd.DataFrame(mse_dict[p_type][tree_number])
             dfs[p_type][tree_number].index = training_size
@@ -533,6 +543,7 @@ def do_one_versus_hundred_trees_simulation(settings:dict|None = None, test_set_s
 
         type_end = time.time() - type_start
         print(f'Type {p_type} took {type_end} seconds.', flush=True)
+
 
 def do_block_length_simulation(settings:dict|None = None, set_sizes:dict|None=None, mc_iterations:int=1000):
     """ Performs simulation on the length of blocks for the block and the circular block bootstrap."""

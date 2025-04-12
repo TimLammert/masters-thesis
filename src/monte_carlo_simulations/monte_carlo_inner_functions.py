@@ -7,7 +7,7 @@ or building them inside the function, passing hyperparameters or performing hype
 Helpers to create simulated datasets  and tune hyperparameters are below the main function.
 
 Quite a few features were included in the code early on (garch predictions with noise added to variance,
-larger variance for error term in AR/RW process, multi-step ahead forecast), but not used in the thesis.
+larger variance for error term in AR/RW process, longer horizon forecast), but not used in the thesis.
 
 Functions that perform specific simulations, as well as functions that unpack and process the simulation results are
 stored in different scripts.
@@ -132,7 +132,6 @@ def do_mc_simulation(
         for fc_type in types
     }
 
-    #evaluation['true_model_mse'] = []
     if fixed_and_rolling:
         evaluation['rolling_fixed_dm'] =  {
             mod: {
@@ -202,7 +201,7 @@ def do_mc_simulation(
                     min_samples_split=hyperparameters['no_block']['estimator__min_samples_split']
                 ),
                 'circular_block': BaggedTree(
-                    random_state=randstate + 1,
+                    random_state=randstate + 1, # block and circular block have small risk of producing identical results
                     n_estimators=hyperparameters['circular_block']['n_estimators'],
                     time_series=True,
                     block_bootstrap=True,
@@ -231,17 +230,7 @@ def do_mc_simulation(
                         window
                  )
 
-            # forecasts['true_model'] = get_true_model_forecast(
-            #     model_type=process_type,
-            #     data=data,
-            #     window=window,
-            #     parameters=parameters,
-            #     steps_ahead=steps_ahead
-            # )
 
-            # evaluation['true_model_mse'].append(
-            #     mean_squared_error(data['testing']['y'], forecasts['true_model']) / np.var(data['testing']['y'])
-            # )
             for fc_type in types:
                 for mod in base_models:
 
@@ -278,7 +267,9 @@ def do_mc_simulation(
 
 
 def get_simulation_data(process_type, set_sizes, parameters, steps_ahead=1, garch_variance_noise=0, ar_sigma=1):
-    """ Collects simulated data given a determined process. """
+    """
+    Generates simulated data given a data generating process.
+    """
     if process_type == 'GARCH':
         data = get_garch_data(
             set_sizes,
@@ -298,16 +289,20 @@ def get_simulation_data(process_type, set_sizes, parameters, steps_ahead=1, garc
     return data
 
 
-def simulate_AR(observations:int, parameters:list, sigma:float=1):
-    """Simulates autoregressive process for a given number of observations and list of autoregressive parameters."""
+def simulate_ar(observations:int, parameters:list, sigma:float=1):
+    """
+    Simulates autoregressive process for a given number of observations and list of autoregressive parameters.
+    """
 
     ar_lag_polynomial = np.r_[1, -np.array(parameters)]
     ma_lag_polynomial = np.array([1])
     return pd.DataFrame(ArmaProcess(ar_lag_polynomial, ma_lag_polynomial).generate_sample(observations, scale=sigma))
 
 
-def simulate_GARCH(observations: int, parameters: list):
-    """Simulates a GARCH(1,1) process for a given number of observations and list of parameters."""
+def simulate_garch(observations: int, parameters: list):
+    """
+    Simulates a GARCH(1,1) process for a given number of observations and list of parameters.
+    """
 
     gm = GARCH(p=1, o=0, q=1)
     rng = lambda n: np.random.normal(loc=0, scale=1, size=n)
@@ -321,12 +316,14 @@ def simulate_GARCH(observations: int, parameters: list):
 
 
 def get_garch_data(set_sizes: dict, parameters: list, steps_ahead: int = 1, noise_scale=0):
-    """ Builds training and testing datasets from a GARCH(1,1) process."""
+    """
+    Builds training and testing datasets from a GARCH(1,1) process.
+    """
 
     total_obs = sum(set_sizes.values())
     variance_noise = pd.Series(np.random.normal(loc=0, scale=noise_scale, size=total_obs))  # Noise series
 
-    simulation = simulate_GARCH(observations=total_obs, parameters=parameters)
+    simulation = simulate_garch(observations=total_obs, parameters=parameters)
 
     noisy_variance = (simulation[1] + variance_noise)
 
@@ -355,7 +352,7 @@ def get_ar_data(set_sizes: dict, parameters: list, steps_ahead: int = 1, sigma: 
     discard_obs = order - 1
 
     total_obs = sum(set_sizes.values())
-    simulation = simulate_AR(observations=total_obs, parameters=parameters, sigma=sigma)
+    simulation = simulate_ar(observations=total_obs, parameters=parameters, sigma=sigma)
 
     y = simulation[0].iloc[discard_obs + steps_ahead:].reset_index(drop=True)
     x = pd.DataFrame({
@@ -379,7 +376,9 @@ def get_ar_data(set_sizes: dict, parameters: list, steps_ahead: int = 1, sigma: 
 
 
 def tune_hyperparameters(tuning_data, hyperparameter_grids: dict | None = None):
-    """ Tunes hyperparameters of the bootstrap, block bootstrap and circular block bootstrap bagged tree models."""
+    """
+    Tunes hyperparameters of the bootstrap, block bootstrap and circular block bootstrap bagged tree models.
+    """
 
     optimal_block_size = int(round(len(tuning_data['training']['y']) ** (1 / 3)))
     if hyperparameter_grids is None:
@@ -415,63 +414,3 @@ def tune_hyperparameters(tuning_data, hyperparameter_grids: dict | None = None):
         hyperparameters[tree_type] = tuning_tree.best_parameters
 
     return hyperparameters
-
-
-# def get_true_model_forecast(model_type:str, parameters, data, window=None, steps_ahead=1):
-#     """ Forecasts the test set based on the model used to generate the data."""
-#
-#     if model_type == 'AR':
-#         if len(parameters) > 1 and steps_ahead > 1:
-#             msg = 'Function can only handle steps_ahead > 1 for AR(1) or AR(p>1) for steps_ahead=1.'
-#             raise ValueError(msg)
-#
-#         AR_params = np.array(parameters)
-#         model_forecast = data['testing']['x'] @ (AR_params ** steps_ahead)
-#
-#     elif model_type == 'GARCH':
-#         model_forecast = do_garch_forecast(data, window=window)
-#     elif model_type == 'RW':
-#         model_forecast = pd.Series(data['testing']['x'].iloc[:,0])
-#
-#     else:
-#         msg = 'Choose either GARCH, AR or RW'
-#         raise ValueError(msg)
-#
-#     return model_forecast
-
-
-# def do_garch_forecast(data: dict, steps_ahead:int = 1, window=None):
-#     """ Forecasts the test set using a GARCH(1,1) model."""
-#
-#     if window is None:
-#         window = len(data['training']['x'])
-#
-#     x_train = data['training']['x']['residuals']
-#     x_test = data['testing']['x']['residuals']
-#
-#     var_bounds = np.column_stack([np.full(window, 1e-6), np.full(window, 5 * np.var(x_train))])
-#
-#     garch_fit = arch_model(x_train, vol='GARCH', p=1, q=1, mean='Zero').fit(disp="off")
-#     omega, alpha, beta = garch_fit.params[['omega', 'alpha[1]', 'beta[1]']]
-#
-#     garch_model = GARCH(p=1, q=1)
-#
-#     last_variance = garch_fit.conditional_volatility.iloc[-1] ** 2
-#
-#     garch_forecast = []
-#     window_set = x_train.tolist()
-#
-#     for obs in x_test:
-#         window_set.append(obs)
-#         window_set = window_set[-window:]
-#
-#         rolling = garch_model.forecast(
-#             parameters=np.array([omega, alpha, beta]),
-#             resids=np.array(window_set[-window:]),
-#             backcast=last_variance,
-#             var_bounds=var_bounds,
-#             horizon=steps_ahead
-#         )
-#         garch_forecast.append(float(rolling.forecasts[0, -1]))
-#         last_variance = garch_forecast[-1]
-#     return np.array(garch_forecast)
