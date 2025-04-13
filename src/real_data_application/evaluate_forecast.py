@@ -1,7 +1,7 @@
 """
 Builds tables from the results of the volatility forecast, comparing the different models and
 displaying feature importances, hyperparameters, etc. Some tables were not used in the thesis.
-Other were created separately in this script and later combined manually.
+Others were created separately in this script and later combined manually.
 """
 
 import pandas as pd
@@ -17,7 +17,7 @@ def create_all_tables():
     """
     Creates all tables for all forecasts discussed in the thesis.
     """
-    for sqrt in [False]:
+    for sqrt in [True, False]:
         for step in [1] if sqrt else [1, 5, 22]:
             create_tables_for_one_setup(steps_ahead=step, square_root=sqrt)
 
@@ -159,7 +159,9 @@ def create_evaluation_dfs(data, results, setup_model_strings, significance_level
 
         r_squared_string = r_squared.apply(lambda col: col.map(lambda x: f"{x:.2f}"))
         mse_string_df = tables[fc_type]['mean squared error'].apply(lambda col: col.map(lambda x: f"{x:.2f}"))
-        significance_star_df = sum(tables[fc_type]["diebold_mariano"].values()).fillna(0).apply(lambda col: col.map(lambda x: "*" * int(x)))
+        significance_star_df = sum(
+            tables[fc_type]["diebold_mariano"].values()
+        ).fillna(0).apply(lambda col: col.map(lambda x: "*" * int(x)))
         out[fc_type] = pd.concat([mse_string_df + significance_star_df, r_squared_string], axis=1)
 
     return out
@@ -176,7 +178,7 @@ def create_forecast_comparison_table(tables, steps_ahead, square_root, forecast_
         folder_path.mkdir(parents=True, exist_ok=True)
 
     if forecast_types is None:
-        forecast_types = ['fixed', 'rolling'] 
+        forecast_types = ['fixed', 'rolling']
     for fc_type in forecast_types:
         df = tables[fc_type]
         table_str = df_to_latex(df, f'{fc_type} forecast comparison', f'{fc_type}-comparison')
@@ -228,26 +230,6 @@ def create_importance_and_hyperparameter_tables(results, setups, square_root, st
     for setup in setups:
         hyperparameter_dfs[setup] = pd.DataFrame(results[f'{setup} additional_info']['best_parameters'], index=[0]).T
 
-        # permutation_series = results[f'{setup} additional_info']['permutation importance']
-        # permutation_df = pd.DataFrame(permutation_series.rename(variable_rename_dict))
-        # permutation_df /= permutation_df.max()
-        #
-        # importance_table = df_to_latex(
-        #    df=permutation_df,
-        #    table_name=f'{setup} Permutation Importance ({rv_name})',
-        #    table_label=f'{label_id}_{setup}_permimp',
-        #    round=4
-        # )
-        # hyperparameter_dfs[setup] = pd.DataFrame(results[f'{setup} additional_info']['best_parameters'],
-        #                                         index=[0]).T
-        #
-        # for file_name, table in [
-        #    [f'{setup}_{label_id}_{steps_ahead}_step_permutation_importance.txt', importance_table]
-        # ]:
-        #    file_path = folder_path / file_name
-        #    with open(file_path, "w") as f:
-        #        f.write(table)
-
     setups = ['RV', 'RV-M', 'CJ', 'CJ-M']
     hyperparameter_df = pd.concat([hyperparameter_dfs[setup] for setup in setups], axis=1)
     hyperparameter_df.columns = setups
@@ -283,9 +265,9 @@ def create_ols_summary_tables(results, square_root, steps_ahead, variable_rename
     variable_order = {
         'RV': ['const', 'RV_t-1', 'ave_RV_t-1_t-5', 'ave_RV_t-1_t-22', 'Fed Effective Rate', 'GDP Growth', 'Inflation',
                'Unemployment', 'Fed Meetings', 'GDP Release', 'Inflation Release', 'Unemployment Release'],
-        'CJ': ['const', 'C_t-1', 'ave_C_t-1_t-5', 'ave_C_t-1_t-22', 'J_t-1', 'ave_J_t-1_t-5', 'ave_J_t-1_t-22', 'Fed Effective Rate',
-               'GDP Growth', 'Inflation', 'Unemployment', 'Fed Meetings', 'GDP Release', 'Inflation Release',
-               'Unemployment Release'],
+        'CJ': ['const', 'C_t-1', 'ave_C_t-1_t-5', 'ave_C_t-1_t-22', 'J_t-1', 'ave_J_t-1_t-5', 'ave_J_t-1_t-22',
+               'Fed Effective Rate', 'GDP Growth', 'Inflation', 'Unemployment', 'Fed Meetings', 'GDP Release',
+               'Inflation Release', 'Unemployment Release'],
 
     }
     for no_macro, macro in [['RV', 'RV-M'], ['CJ', 'CJ-M']]:

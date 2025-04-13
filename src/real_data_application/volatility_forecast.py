@@ -1,3 +1,6 @@
+"""
+Computes forecasts of S&P500 realized variance for different specifications.
+"""
 import pandas as pd
 import numpy as np
 import pickle
@@ -14,7 +17,7 @@ def compute_all_forecasts(training_observations=3000):
     and a 1-step-ahead forecast for the square root of realized variance.
     """
     np.random.seed(291)
-    for sqrt in [False]:
+    for sqrt in [True, False]:
         for step in [1] if sqrt else [1, 5, 22]:
             start = time.time()
             print(f'Starting forecasts for {step} steps, square_root {sqrt}', flush=True)
@@ -61,7 +64,6 @@ def fit_models_and_compute_forecast(
     The BaggedTree class is used to compute the bagged tree forecast.
     """
 
-
     if tuning_grid is None:
         tuning_grid = {
             "estimator__max_depth": [6, 8, 10, None],
@@ -77,7 +79,6 @@ def fit_models_and_compute_forecast(
     )
     tuning_start = time.time()
     tree_model.fit(data['training']['x'], data['training']['y'], param_grid=tuning_grid, cv_splits=5, n_jobs=2)
-    # tree_model.fit(data['training']['x'], data['training']['y'])
     tuning_time = time.time() - tuning_start
     print(f'Cross-Validation took {tuning_time} seconds.', flush=True)
 
@@ -86,7 +87,6 @@ def fit_models_and_compute_forecast(
     har_forecast = {}
 
     additional_info = {}
-
     tree_forecast['fixed'] = tree_model.predict(data['testing']['x'])
     har_forecast['fixed'], additional_info['ols_summary'] = get_ols_forecast(data, rolling=False)
 
@@ -153,7 +153,12 @@ def get_ols_forecast(data, rolling=False, window_size=None):
     return model_forecast, (model if not rolling else None)
 
 
-def do_one_specification_forecast_for_all_datasets(steps_ahead=1, training_obs=3000, square_root=False, fixed_and_rolling=True):
+def do_one_specification_forecast_for_all_datasets(
+        steps_ahead=1,
+        training_obs=3000,
+        square_root=False,
+        fixed_and_rolling=True
+):
     """
     Calls functions to compute forecasts from all four datasets for one horizon and one value of square_root.
     Stores the results in a pickle file.
@@ -162,7 +167,9 @@ def do_one_specification_forecast_for_all_datasets(steps_ahead=1, training_obs=3
 
     input_folder_path = BLD_data / 'application'
     input_file_name = (
-        f'datasets_{steps_ahead}_step_ahead_square_root.pkl' if square_root else f'datasets_{steps_ahead}_step_ahead.pkl'
+        f'datasets_{steps_ahead}_step_ahead_square_root.pkl'
+        if square_root else
+        f'datasets_{steps_ahead}_step_ahead.pkl'
     )
     input_file_path = input_folder_path / input_file_name
 
@@ -180,7 +187,10 @@ def do_one_specification_forecast_for_all_datasets(steps_ahead=1, training_obs=3
     for model in model_types:
         try:
             model_start = time.time()
-            training_testing_data[model], test_index = split_testing_and_training_x_and_y(datasets[model], training_obs)
+            training_testing_data[model], test_index = split_testing_and_training_x_and_y(
+                datasets[model],
+                training_obs
+            )
             (
                 model_results[f'BT-{model}'],
                 model_results[f'HAR-{model}'],
@@ -198,8 +208,16 @@ def do_one_specification_forecast_for_all_datasets(steps_ahead=1, training_obs=3
             print(f"Error on model {model}, {steps_ahead} step, square_root {square_root}: {e}", flush=True)
             continue
 
-    forecast_file_name = f'real_data_forecasts_{steps_ahead}_step_ahead_square_root.pkl' if square_root else f'real_data_forecasts_{steps_ahead}_step_ahead.pkl'
-    data_file_name = f'real_data_data_{steps_ahead}_step_ahead_square_root.pkl' if square_root else f'real_data_data_{steps_ahead}_step_ahead.pkl'
+    forecast_file_name = (
+        f'real_data_forecasts_{steps_ahead}_step_ahead_square_root.pkl'
+        if square_root else
+        f'real_data_forecasts_{steps_ahead}_step_ahead.pkl'
+    )
+    data_file_name = (
+        f'real_data_data_{steps_ahead}_step_ahead_square_root.pkl'
+        if square_root else
+        f'real_data_data_{steps_ahead}_step_ahead.pkl'
+    )
 
     forecast_path = output_folder_path / forecast_file_name
     data_path = output_folder_path / data_file_name
@@ -210,13 +228,3 @@ def do_one_specification_forecast_for_all_datasets(steps_ahead=1, training_obs=3
 
 if __name__ == '__main__':
     compute_all_forecasts(training_observations=3000)
-
-
-
-
-
-
-
-
-
-

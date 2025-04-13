@@ -168,7 +168,6 @@ def process_fixed_and_rolling_simulations(processes:list|None = None):
         file_path = BLD_data / 'rolling_fixed' / f'{p_type}_1_fixed_and_rolling_simulation.pkl'
         with open(file_path, 'rb') as f:
             loaded_file = pickle.load(f)
-        loaded_file = loaded_file[0]
         evaluation[p_type] = unpack_evaluation(loaded_file['evaluation'], fc_types=['fixed', 'rolling'])
         unpacked[p_type] = {}
 
@@ -232,7 +231,7 @@ def create_number_of_trees_subplots(process_results):
         folder_path.mkdir(parents=True, exist_ok=True)
 
     name_dict = {
-        'no_block': 'Regular Bootstrap',
+        'no_block': 'I.i.d. Bootstrap',
         'block': 'Block Bootstrap',
         'circular_block': 'Circular Block Bootstrap'
     }
@@ -277,7 +276,7 @@ def create_number_of_trees_subplots(process_results):
         )
 
     fig.update_layout(
-        annotations=[dict(font=dict(size=10)) for a in fig['layout']['annotations']]  # Smaller subplot titles
+        annotations=[dict(font=dict(size=10)) for a in fig['layout']['annotations']]
     )
 
     fig = update_plot_layout(fig, subplots=True)
@@ -339,7 +338,7 @@ def plot_set_size_simulation(process, data):
         folder_path.mkdir(parents=True, exist_ok=True)
 
     name_dict ={
-        'no_block': 'Regular Bootstrap',
+        'no_block': 'I.i.d. Bootstrap',
         'block': 'Block Bootstrap',
         'circular_block': 'Circular Block Bootstrap'
     }
@@ -386,7 +385,7 @@ def create_sample_size_subplots(process_results):
         folder_path.mkdir(parents=True, exist_ok=True)
 
     name_dict = {
-        'no_block': 'Regular Bootstrap',
+        'no_block': 'I.i.d. Bootstrap',
         'block': 'Block Bootstrap',
         'circular_block': 'Circular Block Bootstrap'
     }
@@ -407,12 +406,12 @@ def create_sample_size_subplots(process_results):
     for col_index, process in enumerate(processes, start=1):
         df = process_results[process]
         for i, model in enumerate(df.columns):
-            show_legend = col_index == 1  # Show legend only for the first subplot
+            show_legend = col_index == 1
             fig.add_trace(go.Scatter(
                 x=df.index,
                 y=df[model],
                 mode='lines+markers',
-                name=name_dict[model] if show_legend else None,  # Only name legend items once
+                name=name_dict[model] if show_legend else None,
                 line=dict(color=colour_dict[model], width=0.75),
                 marker=dict(size=4),
                 showlegend=show_legend
@@ -431,9 +430,8 @@ def create_sample_size_subplots(process_results):
             row=1, col=col_index
         )
 
-    # Adjust subplot title font size
     fig.update_layout(
-        annotations=[dict(font=dict(size=12)) for a in fig['layout']['annotations']]  # Smaller subplot titles
+        annotations=[dict(font=dict(size=12)) for a in fig['layout']['annotations']]
     )
 
     fig = update_plot_layout(fig, subplots=True)
@@ -519,7 +517,7 @@ def create_one_versus_hundred_subplots(process_results):
             type="log",
             tickvals=df.index,
             ticktext=[f"{i}" for i in df.index],
-            title_text="Sample Size" if col_index == (len(processes) // 2 + 1) else None,
+            title_text="Training Set Size" if col_index == (len(processes) // 2 + 1) else None,
             row=1, col=col_index
         )
 
@@ -538,7 +536,7 @@ def create_one_versus_hundred_subplots(process_results):
         ))
 
     fig.update_layout(
-        annotations=[dict(font=dict(size=10)) for a in fig['layout']['annotations']],  # Smaller subplot titles
+        annotations=[dict(font=dict(size=10)) for a in fig['layout']['annotations']],
         legend_title_text=""
     )
 
@@ -590,7 +588,7 @@ def create_block_size_subplots(process_results):
         folder_path.mkdir(parents=True, exist_ok=True)
 
     name_dict = {
-        'no_block': 'Regular Bootstrap',
+        'no_block': 'I.i.d. Bootstrap',
         'block': 'Block Bootstrap',
         'circular_block': 'Circular Block Bootstrap'
     }

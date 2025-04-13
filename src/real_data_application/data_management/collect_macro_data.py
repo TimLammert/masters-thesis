@@ -214,16 +214,3 @@ def get_fed_meeting_dates():
 
 if __name__ == '__main__':
     collect_macro_inputs()
-
-
-
-
-
-
-
-
-
-
-
-
-

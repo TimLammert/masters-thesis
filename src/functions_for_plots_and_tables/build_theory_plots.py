@@ -47,7 +47,6 @@ def create_rectangular_partition_and_tree_plots(folder_path):
     x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
     y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
 
-    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
 
     feature_range = (x_min, x_max, y_min, y_max)
     boxes = get_boxes(reg_tree.tree_, feature_range)
@@ -133,7 +132,7 @@ def create_instability_plot(folder_path):
     for set in sets:
         if set != 'oos':
             fig.add_trace(go.Scatter(x=df.index, y=df[set], mode='lines', name='Tree 1', line=dict(width=1)))
-    # fig.add_trace(go.Scatter(x=df.index, y=df['tree_2'], mode='lines', name='Tree 2', line=dict(width=1)))
+
     fig.update_layout(template="plotly_white")
     fig = update_plot_layout(fig)
     fig.update_layout(showlegend=False,
@@ -243,7 +242,6 @@ def create_combined_plot(folder_path):
 
     colors = {'Unbagged': '#FF7F32', 'Bagged': '#3B5998'}
 
-    # First subplot
     fig.add_trace(
         go.Scatter(
             x=df1.index,
@@ -269,7 +267,6 @@ def create_combined_plot(folder_path):
         col=1
     )
 
-    # Second subplot
     fig.add_trace(
         go.Scatter(x=df2.index, y=df2['y'], mode='markers', marker=dict(size=2, color='lightgray', opacity=0.999),
                    showlegend=False), row=1, col=2)
@@ -354,7 +351,7 @@ def create_random_walk_failure_plot(folder_path):
         )
     fig.update_layout(
         xaxis_title='t',
-        yaxis_title='Y'
+        yaxis_title='$X_t$'
     )
     fig = update_plot_layout(fig)
     fig.write_image(folder_path / 'random_walk_failure_plot.png', scale=3)

@@ -89,7 +89,7 @@ def build_har_cj_data(steps_ahead, square_root):
     power = 0.5 if square_root else 1
 
     folder_path = BLD_data / 'application'
-    with open(folder_path / 'realized_quantities.pkl', 'rb') as f:
+    with open(DATA_DIR / 'realized_quantities.pkl', 'rb') as f:
         volatility_data = pickle.load(f)
 
 
@@ -114,7 +114,7 @@ def build_macroeconomic_data():
     with open(folder_path / 'macroeconomic_inputs.pkl', 'rb') as f:
         macro_inputs = pickle.load(f)
 
-    with open(folder_path / 'realized_quantities.pkl', 'rb') as f:
+    with open(DATA_DIR / 'realized_quantities.pkl', 'rb') as f:
         volatility_data = pickle.load(f)
 
     macroeconomic_data = pd.DataFrame(index=volatility_data.index)
@@ -128,14 +128,6 @@ def build_macroeconomic_data():
         if col != 'Fed Effective Rate':
             macroeconomic_data[col] = macroeconomic_data[col].ffill()
         macroeconomic_data[col] = macroeconomic_data[col].shift(1)
-
-
-    # Fill first
-    #macroeconomic_data['Inflation'].loc['2008-01-02'] = macro_inputs['inflation']['YoY Inflation'].loc['2007-12-14']
-    #macroeconomic_data['GDP Growth'].loc['2008-01-02'] = macro_inputs['gdp']['GDP Growth'].loc['2007-12-20']
-    #macroeconomic_data['Unemployment'].loc['2008-01-02'] = macro_inputs['unemployment']['Unemployment Values'].loc[
-    #    '2007-12-07']
-
 
     macroeconomic_data['Unemployment Release'] = macro_inputs['unemployment']['Unemployment Release Dummy']
     macroeconomic_data['GDP Release'] = macro_inputs['gdp']['GDP Release Dummy']

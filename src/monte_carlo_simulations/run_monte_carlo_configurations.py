@@ -100,7 +100,7 @@ def do_number_of_trees_simulation(settings:dict|None = None, set_sizes:dict|None
         'no_block': {
             "estimator__max_depth": [6, 8, 10, None],
             "estimator__min_samples_split": [2, 5, 10, 20],
-            'n_estimators': [50],
+            'n_estimators': [50]
         },
         'circular_block': {
             "estimator__max_depth": [2, 4, 10, None],
@@ -217,7 +217,7 @@ def do_fixed_window_simulation(
 
         type_start = time.time()
         np.random.seed(np.random.randint(0, 2 ** 32))
-        results, garch_params = do_mc_simulation(
+        results = do_mc_simulation(
             process_type=p_type,
             mc_iterations=mc_iterations,
             steps_ahead=1,
@@ -696,12 +696,12 @@ def do_single_regression_tree_forecast(fixed_data_sets, mc_iterations, training_
 
 
 if __name__ == '__main__':
+    do_fixed_window_simulation(mc_iterations=1000)
     do_one_versus_hundred_trees_simulation(test_set_size=1000, mc_iterations=1000)
-    #do_fixed_window_simulation(mc_iterations=1000)
-    #do_training_set_size_simulation(settings={test_set_size=1000, mc_iterations=1000)
-    #do_block_length_simulation(mc_iterations=1000)
-    #do_number_of_trees_simulation(mc_iterations=1000)
-    #do_rolling_fixed_simulation(settings={'RW': [1]}, mc_iterations=200)
+    do_training_set_size_simulation(test_set_size=1000, mc_iterations=1000)
+    do_block_length_simulation(mc_iterations=1000)
+    do_number_of_trees_simulation(mc_iterations=1000)
+    do_rolling_fixed_simulation(settings={'RW': [1]}, mc_iterations=200)
 
 
 
