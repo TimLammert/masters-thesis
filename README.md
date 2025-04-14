@@ -16,7 +16,7 @@ These codes build plots for the theory section, perform Monte Carlo simulations,
 compute and evaluate a real data forecast of S&P 500 volatility.
 Codes can be run at the bottom of the scripts.
 Some tables created by this code were not used in the final version of the thesis or modified manually.
-Distribution of the original S&P 500 intraday price dataset is not permitted. Hence, a sample for running the function that computed the realized quantities is included. Additionally, the computed figures for the entire dataset are stored in the data folder. 
+Distribution of the original S&P 500 intraday price dataset is not permitted. Hence, a sample for running the function that computes the realized quantities is included. Additionally, the computed figures for the entire dataset are stored in the data folder. 
 
 
 ## Credits 
