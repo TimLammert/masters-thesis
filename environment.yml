@@ -10,12 +10,10 @@ dependencies:
   - ipykernel
   - jupyterlab
 
-  # Python template project dependencies
+  # Packages
   - statsmodels
   - plotly >=5.2.0,<6
   - matplotlib
-
-  # Packages
   - numpy
   - pandas >= 2.2
   - scikit-learn
@@ -23,5 +21,5 @@ dependencies:
   - arch-py
   - openpyxl
 
-  # Install project
+  # Pip dependencies
   - pip: [-e ., pdbp, kaleido, arch]
